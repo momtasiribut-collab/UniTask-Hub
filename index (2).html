@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ระบบบริหารจัดการรายวิชาและตารางงาน</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1FB;--card:#fff;--tx:#1E2340;--mu:#7A809C;--pr:#4254E8;--pr2:#E8EBFD;--ln:#E6E8F2;--red:#EF4444;--ok:#10B981}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1224;--card:#1B1F38;--tx:#EEF0FF;--mu:#9AA0C0;--pr:#6C7BFF;--pr2:#262B50;--ln:#2B3058}}
+:root[data-theme="dark"]{--bg:#0F1224;--card:#1B1F38;--tx:#EEF0FF;--mu:#9AA0C0;--pr:#6C7BFF;--pr2:#262B50;--ln:#2B3058}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:'Noto Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--tx);display:flex;justify-content:center;align-items:center;gap:40px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.phone{width:390px;max-width:100%;height:min(800px,100%);background:var(--bg);border-radius:32px;box-shadow:0 20px 60px #2a3a9a33;border:1px solid var(--ln);display:flex;flex-direction:column;overflow:hidden;position:relative}
+@media(max-width:500px){.phone{border-radius:0;border:0;height:100%;box-shadow:none}}
+.scr{flex:1;overflow:auto;padding:18px 16px 20px}
+h1{font-size:20px}h2{font-size:15px;margin:16px 0 8px}
+.mu{color:var(--mu);font-size:12px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:10px}.sp{flex:1}
+.btn{border:0;background:var(--pr);color:#fff;font:600 14px inherit;font-family:inherit;padding:12px;border-radius:10px;width:100%;cursor:pointer}
+.btn.l{background:var(--pr2);color:var(--pr)}.btn.d{background:var(--red)}
+.btn.g{background:none;color:var(--pr)}
+.ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.ib{border:0;background:none;font-size:20px;cursor:pointer;color:var(--tx);padding:4px;position:relative}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+input,select,textarea{width:100%;font:14px inherit;font-family:inherit;padding:11px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);margin:4px 0 12px}
+label{font-size:13px;font-weight:600}label b{color:var(--red)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{border:0;padding:7px 14px;border-radius:20px;background:var(--card);color:var(--mu);font:500 12px inherit;font-family:inherit;cursor:pointer;border:1px solid var(--ln)}
+.tab.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.chip{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
+.chip.red{background:#FEE2E2;color:#B91C1C}.chip.amber{background:#FEF3C7;color:#B45309}.chip.blue{background:#DBEAFE;color:#1D4ED8}.chip.ok{background:#D1FAE5;color:#047857}
+.nav{display:flex;background:var(--card);border-top:1px solid var(--ln);padding:6px 0 8px}
+.nav button{flex:1;border:0;background:none;color:var(--mu);font:500 10px inherit;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button span{font-size:18px}.nav button.on{color:var(--pr)}
+.fab{position:absolute;right:18px;bottom:84px;width:50px;height:50px;border-radius:50%;background:var(--pr);color:#fff;border:0;font-size:26px;box-shadow:0 6px 16px #4254e866;cursor:pointer}
+.sw{width:42px;height:24px;border-radius:12px;background:var(--ln);position:relative;border:0;cursor:pointer;flex:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--pr)}.sw.on::after{left:21px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:13px;row-gap:4px}
+.cal .h{color:var(--mu);font-size:11px}
+.cal .d{height:36px;border-radius:50%;border:0;background:none;color:var(--tx);font:inherit;cursor:pointer;position:relative}
+.cal .d.t{border:1px solid var(--pr)}.cal .d.on{background:var(--pr);color:#fff}
+.cal .d i{position:absolute;bottom:3px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--red)}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#1E2340;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:9}
+.side{width:380px;display:none}
+@media(min-width:1000px){.side{display:block}}
+.side h1{margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg div{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;font-size:13px}
+.fg b{display:block;font-size:22px}
+body{background:radial-gradient(circle at 15% 10%,color-mix(in srgb,var(--pr) 18%,transparent),transparent 45%),radial-gradient(circle at 90% 90%,color-mix(in srgb,#9b7bff 20%,transparent),transparent 40%),var(--bg)}
+.phone{background:linear-gradient(180deg,color-mix(in srgb,var(--pr) 8%,var(--bg)),var(--bg) 220px)}
+.scr>*{animation:up .35s ease}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@keyframes up{from{opacity:0;transform:translateY(8px)}}
+.card{box-shadow:0 2px 10px #2a3a9a14;transition:.15s}.card[onclick]:hover{transform:translateY(-2px);box-shadow:0 8px 18px #2a3a9a26}
+.btn{background:linear-gradient(135deg,var(--pr),#7a88ff);box-shadow:0 6px 14px #4254e844;transition:.15s}.btn:active{transform:scale(.97)}
+.btn.l{background:var(--pr2);box-shadow:none}.btn.g{background:none;box-shadow:none}.btn.d{background:linear-gradient(135deg,#ef4444,#f87171);box-shadow:0 6px 14px #ef444444}
+.ic{box-shadow:0 4px 10px #00000022}
+.hero{background:linear-gradient(135deg,#4254E8,#7a88ff)!important;color:#fff;border:0;box-shadow:0 10px 24px #4254e855}.hero .mu{color:#ffffffcc}
+.av{background:linear-gradient(135deg,#4254E8,#9b7bff);box-shadow:0 0 0 3px var(--pr2)}
+.logo{width:140px;height:140px;margin:0 auto;border-radius:36px;display:grid;place-items:center;font-size:72px;background:linear-gradient(135deg,#fff,var(--pr2));box-shadow:0 18px 40px #4254e844;animation:fl 3s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-8px)}}
+.nav{box-shadow:0 -6px 20px #2a3a9a14}.nav button.on span{background:var(--pr2);border-radius:12px;padding:2px 14px}
+.fab{background:linear-gradient(135deg,var(--pr),#7a88ff)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pr);border-color:transparent}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}.stat .card{text-align:center;margin:0}.stat b{font-size:26px;color:var(--pr);display:block}
+</style>
+</head>
+<body>
+<div class="phone"><div class="scr" id="app"></div><div id="nv"></div></div>
+<aside class="side">
+<h1>ฟีเจอร์หลักของระบบ</h1>
+<div class="fg">
+<div><b>📋</b>เลือกข้อมูลตารางเรียนจากรายวิชาที่ลงทะเบียน</div>
+<div><b>📝</b>ป้อนรายการงานพร้อมรายละเอียด</div>
+<div><b>⏰</b>กำหนดวัน-เวลาส่งงานพร้อมแจ้งเตือน</div>
+<div><b>📷</b>ถ่ายรูป / แนบไฟล์ประกอบงาน</div>
+<div><b>📅</b>ดูปฏิทินแบบรายวัน/รายสัปดาห์/รายเดือน</div>
+<div><b>💾</b>บันทึกลงฐานข้อมูลอัตโนมัติ (ซิงก์ข้ามอุปกรณ์)</div>
+</div>
+</aside>
+<script>
+window.addEventListener('error',e=>{const a=document.querySelector('#app');if(a&&!a.innerHTML.trim())a.innerHTML='<p style="padding:20px">เกิดข้อผิดพลาด: '+e.message+'</p>'});
+let NAME='นางสาวบี เบิร์ดนก';const TODAY='2025-04-15',TM=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const C={CPE11267:{n:'CPE11267',ab:'CPE',s:'CPE',t:'ยังไม่ระบุเวลาเรียน',c:'#8B5CF6'},CPE23167:{n:'CPE23167',ab:'CPE',s:'CPE',t:'ยังไม่ระบุเวลาเรียน',c:'#EC4899'},CPE23367:{n:'CPE23367',ab:'CPE',s:'CPE',t:'ยังไม่ระบุเวลาเรียน',c:'#14B8A6'},CPE21167:{n:'CPE21167',ab:'CPE',s:'CPE',t:'ยังไม่ระบุเวลาเรียน',c:'#F97316'},CS:{n:'Computer Science',s:'SEC 01',t:'จันทร์ 08:00 - 10:00',c:'#4254E8'},EN:{n:'English for Communication',s:'SEC 02',t:'อังคาร 10:00 - 12:00',c:'#10B981'},TH:{n:'ภาษาไทยเพื่อการสื่อสาร',s:'SEC 01',t:'พุธ 13:00 - 15:00',c:'#F59E0B'},MA:{n:'คณิตศาสตร์สำหรับวิศวกรรม',s:'SEC 01',t:'ศุกร์ 09:00 - 11:00',c:'#06B6D4'}};
+const def={started:false,sel:['CS','EN','TH','MA'],notify:true,sync:true,tasks:[
+{id:1,title:'ส่งรายงานบทที่ 3',cs:'CS',desc:'จัดทำรายงานบทที่ 3 เกี่ยวกับการพัฒนาเว็บแอปพลิเคชัน',date:'2025-04-15',time:'10:00',file:'report-ch3.pdf'},
+{id:2,title:'ทำแบบฝึกหัด',cs:'EN',desc:'แบบฝึกหัด Unit 5',date:'2025-04-15',time:'13:00',file:''},
+{id:3,title:'อ่านหนังสือ',cs:'TH',desc:'อ่านบทที่ 4 เพื่อสอบย่อย',date:'2025-04-15',time:'16:00',file:''},
+{id:4,title:'งานกลุ่ม',cs:'MA',desc:'โจทย์แคลคูลัสงานกลุ่ม',date:'2025-04-17',time:'09:00',file:''},
+{id:5,title:'สรุปบทเรียน',cs:'CS',desc:'สรุปบทที่ 1-3',date:'2025-04-18',time:'10:00',file:''}]};
+let S;try{S=JSON.parse(localStorage.getItem('cs26'))||def}catch(e){S=def}
+const ls=()=>{try{localStorage.setItem('cs26',JSON.stringify(S))}catch(e){}},save=()=>{ls();pp()};
+const sess=()=>window.lgd===1||(()=>{try{return sessionStorage.getItem('cs26s')=='1'}catch(e){return false}})();const setS=v=>{window.lgd=v?1:0;try{v?sessionStorage.setItem('cs26s','1'):sessionStorage.removeItem('cs26s')}catch(e){}};if(S.name)NAME=S.name;let V={n:S.started&&sess()?'home':'splash'},cal={y:2025,m:3,d:TODAY},tf='all',cf='all';
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
+const fd=d=>{const[y,m,x]=d.split('-');return `${+x} ${TM[m-1].slice(0,3)}. ${+y+543}`};
+const dd=d=>Math.round((new Date(d)-new Date(TODAY))/864e5);
+const st=t=>{if(t.done)return['เสร็จแล้ว','ok'];const x=dd(t.date);return x<0?['เลยกำหนด','red']:x==0?['วันนี้','red']:x<=2?['ใกล้ถึง','amber']:['รอส่ง','blue']};
+const sorted=()=>[...S.tasks].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+const ic=k=>`<div class="ic" style="background:${C[k].c}">${C[k].ab||k}</div>`;
+function go(n,a){if(!sess()&&n!='splash'){n='splash';a=0}V={n,a};render()}
+function toast(m,ms){const e=document.createElement('div');e.className='toast';e.textContent=m;$('.phone').append(e);setTimeout(()=>e.remove(),ms||1800)}
+const back=(t,to)=>`<div class="top"><button class="ib" onclick="go('${to||'home'}')">‹</button><h1>${t}</h1></div>`;
+const tcard=t=>{const[s,c]=st(t);return `<div class="card row" style="cursor:pointer" onclick="go('detail',${t.id})">${ic(t.cs)}<div class="sp"><b style="font-size:14px">${t.title} (${t.cs})</b><div class="mu">${fd(t.date)} · ${t.time}</div></div><span class="chip ${c}">${s}</span></div>`};
+
+const P={
+splash:()=>`<div style="text-align:center;padding-top:50px"><div class="logo">🗓️</div><h1 style="margin:20px 0 8px;font-size:24px">ระบบบริหารจัดการ<br>รายวิชาและตารางงาน</h1><p class="mu" style="margin-bottom:24px">จัดการรายวิชา ตารางเรียน และงานของคุณ<br>ได้อย่างสะดวก ทุกที่ ทุกเวลา</p>${lform()}</div>`,
+home:()=>{const n=S.tasks.filter(t=>t.date==TODAY&&!t.done).length;return `<div class="top"><div class="ic av" style="border-radius:50%;width:44px;height:44px">👤</div><div class="sp"><div class="mu">สวัสดีค่ะ 👋</div><b>${NAME}</b></div><button class="ib" onclick="go('notif')">🔔${S.notify?'<i style="position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--red);border-radius:50%"></i>':''}</button></div>
+<div class="card row hero" style="cursor:pointer" onclick="go('tasks')"><span style="font-size:26px">📌</span><div class="sp"><b>วันนี้มีงานที่ต้องทำ</b><div class="mu">${n} รายการ</div></div>›</div>
+<div class="row"><button class="card sp" style="text-align:center;cursor:pointer;font:inherit;color:inherit" onclick="go('courses')"><div style="font-size:28px">📅</div><b style="font-size:13px">ตารางเรียน</b></button><button class="card sp" style="text-align:center;cursor:pointer;font:inherit;color:inherit" onclick="go('tasks')"><div style="font-size:28px">📄</div><b style="font-size:13px">รายงาน</b></button></div>
+<div class="row"><h2 class="sp">รายวิชาของฉัน</h2><button class="btn g" style="width:auto;padding:0" onclick="go('courses')">ดูทั้งหมด</button></div>
+${S.sel.map(k=>`<div class="card row">${ic(k)}<div><b style="font-size:14px">${C[k].n}</b><div class="mu">${C[k].s} · ${C[k].t}</div></div></div>`).join('')||'<p class="mu">ยังไม่ได้เลือกรายวิชา</p>'}`},
+courses:()=>`${back('เลือกข้อมูลตารางเรียน')}<input id="q" placeholder="🔍 ค้นหารายวิชา..." oninput="cl()"><div class="tabs"><button class="tab ${cf=='all'?'on':''}" onclick="cf='all';render()">ทั้งหมด</button><button class="tab ${cf=='sel'?'on':''}" onclick="cf='sel';render()">ภาคเรียนปัจจุบัน</button></div><div id="cl"></div><button class="btn" onclick="save();toast('บันทึกตารางเรียนแล้ว');go('home')">บันทึก</button>`,
+tasks:()=>{const l=sorted().filter(t=>tf=='all'||(tf=='do'?!t.done:t.done));return `<h1 style="margin-bottom:12px">รายงาน</h1><div class="tabs">${[['all','ทั้งหมด'],['do','กำลังดำเนินการ'],['done','เสร็จแล้ว']].map(a=>`<button class="tab ${tf==a[0]?'on':''}" onclick="tf='${a[0]}';render()">${a[1]}</button>`).join('')}</div>${l.map(tcard).join('')||'<p class="mu" style="text-align:center;margin-top:40px">ไม่มีรายการ</p>'}<button class="fab" onclick="go('form')">+</button>`},
+detail:()=>{const t=S.tasks.find(x=>x.id==V.a);if(!t)return P.tasks();const[s,c]=st(t);return `${back('รายละเอียดงาน','tasks')}<div class="card row">${ic(t.cs)}<div class="sp"><b>${t.title}</b><div class="mu">${C[t.cs].n} (${t.cs}) ${C[t.cs].s}</div></div><span class="chip ${c}">${s}</span></div>
+<h2>📝 รายละเอียด</h2><p class="mu" style="font-size:13px">${t.desc||'-'}</p><h2>🗓️ วัน-เวลาส่งงาน</h2><p class="mu" style="font-size:13px">${fd(t.date)} ${t.time}</p>
+<h2>📎 ไฟล์แนบ</h2>${t.file?`<div class="card">${(t.data||'').startsWith('data:image')?`<img src="${t.data}" style="width:100%;border-radius:10px;margin-bottom:8px">`:''}<div class="row">📄 <b class="sp" style="font-size:13px">${t.file}</b>${t.data?`<button class="btn l" style="width:auto;padding:6px 12px" onclick="dl(${t.id})">⬇️ บันทึก</button>`:''}</div></div>`:'<p class="mu">ไม่มีไฟล์แนบ</p>'}
+<button class="btn l" style="margin:14px 0 10px" onclick="tg(${t.id})">${t.done?'↩ ทำเครื่องหมายว่ายังไม่เสร็จ':'✓ ทำเครื่องหมายว่าเสร็จแล้ว'}</button>
+<div class="row"><button class="btn l" onclick="go('form',${t.id})">แก้ไข</button><button class="btn d" onclick="del(${t.id})">ลบ</button></div>`},
+form:()=>{const t=S.tasks.find(x=>x.id==V.a)||{date:cal.d,time:'10:00'};const e=!!t.id;return `${back(e?'แก้ไขตารางงาน':'เพิ่มรายการงาน',e?'detail':'tasks').replace("go('detail')",`go('detail',${t.id})`)}
+<label>ชื่อรายการงาน <b>*</b></label><input id="ft" value="${t.title||''}" placeholder="เช่น รายงานบทที่ 3">
+<label>รายวิชา <b>*</b></label><select id="fc"><option value="">เลือกวิชาที่ต้องการ</option>${Object.keys(C).map(k=>`<option value="${k}" ${t.cs==k?'selected':''}>${C[k].n==k?k:C[k].n+' ('+k+')'}</option>`).join('')}</select>
+<label>รายละเอียด (ถ้ามี)</label><textarea id="fd" rows="3" placeholder="รายละเอียดเพิ่มเติม...">${t.desc||''}</textarea>
+<label>วัน-เวลาส่งงาน <b>*</b></label><div class="row"><input id="fa" type="date" value="${t.date}"><input id="fi" type="time" value="${t.time}"></div>
+<label>แจ้งเตือนล่วงหน้า</label><select id="fr">${[[0,'ไม่แจ้งเตือน'],[15,'15 นาที'],[60,'1 ชั่วโมง'],[1440,'1 วัน']].map(a=>`<option value="${a[0]}" ${(t.rm??60)==a[0]?'selected':''}>${a[1]}</option>`).join('')}</select><label>แนบไฟล์ / รูปภาพ</label><div class="row" style="margin:6px 0"><label class="btn l" style="text-align:center">📷 ถ่ายรูป<input hidden type="file" accept="image/*" capture="environment" onchange="fn(this)"></label><label class="btn l" style="text-align:center">📎 แนบไฟล์<input hidden type="file" onchange="fn(this)"></label></div><div class="mu" id="fnm" style="margin-bottom:12px">${t.file?'📄 '+t.file:''}</div>
+<button class="btn" onclick="sv(${t.id||0})">${e?'บันทึกการเปลี่ยนแปลง':'บันทึก'}</button>`},
+cal:()=>{const{y,m}=cal,f=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate();let g=['อา','จ','อ','พ','พฤ','ศ','ส'].map(x=>`<div class="h">${x}</div>`).join('')+'<div></div>'.repeat(f);for(let d=1;d<=n;d++){const k=`${y}-${pad(m+1)}-${pad(d)}`;g+=`<button class="d ${k==TODAY?'t':''} ${k==cal.d?'on':''}" onclick="cal.d='${k}';render()">${d}${S.tasks.some(t=>t.date==k)?'<i></i>':''}</button>`}
+const l=sorted().filter(t=>t.date==cal.d);return `<h1 style="margin-bottom:12px">ปฏิทินตารางงาน</h1><div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="ib" onclick="cm(-1)">‹</button><b>${TM[m]} ${y+543}</b><button class="ib" onclick="cm(1)">›</button></div><div class="cal">${g}</div></div><h2>งานในวันที่ ${fd(cal.d)}</h2>${l.map(tcard).join('')||'<p class="mu">ไม่มีงานในวันนี้</p>'}<button class="fab" onclick="go('form')">+</button>`},
+notif:()=>{const t=sorted().filter(x=>!x.done)[0];return `${back('งานใหม่ที่เข้ามา')}${t?`<div class="card" style="border-color:var(--pr)"><div class="row"><span style="font-size:26px">🔔</span><b>มีงานใหม่เข้ามา!</b></div><p class="mu" style="margin:8px 0">วิชา ${t.cs} - ${t.title}<br>กำหนดส่ง: ${fd(t.date)} ${t.time}</p><div class="row"><button class="btn" onclick="go('detail',${t.id})">ดูรายละเอียด</button><button class="btn l" onclick="go('home')">ปิด</button></div></div>`:''}<h2>รายการงานล่าสุด</h2>${sorted().slice(0,4).map(tcard).join('')}`},
+me:()=>{const r=(i,t,k,g)=>`<div class="row" ${g?`onclick="go('${g}')"`:''} style="padding:13px 0;border-bottom:1px solid var(--ln);${g?'cursor:pointer':''}"><span>${i}</span><span class="sp">${t}</span>${k?`<button class="sw ${S[k]?'on':''}" onclick="S['${k}']=!S['${k}'];save();${k=='notify'?'rq();':''}render()"></button>`:'›'}</div>`;return `<h1 style="margin-bottom:12px">ตั้งค่า</h1><div class="card row" style="cursor:pointer" onclick="go('profile')"><div class="ic av" style="border-radius:50%;width:48px;height:48px">👤</div><div><b>${NAME}</b><div class="mu">${S.tasks.length} งาน · ${S.sel.length} รายวิชา</div></div></div><div class="card" style="padding:4px 14px">${r('👤','ข้อมูลส่วนตัว','','profile')}${r('🔔','การแจ้งเตือน','notify')}${r('☁️','ซิงก์ข้อมูลกับคลาวด์','sync')}${r('📦','สำรองข้อมูล','','backup')}${r('ℹ️','เกี่ยวกับแอป','','about')}<div class="row" style="padding:13px 0;border-bottom:1px solid var(--ln);cursor:pointer" onclick="go('admin')"><span>🛠️</span><span class="sp">ระบบหลังบ้าน</span>›</div><div class="row" style="padding:13px 0;cursor:pointer" onclick="setS(0);go('splash')"><span>🚪</span>ออกจากระบบ</div></div><p class="mu" style="text-align:center">${cloudTxt()}</p>`}
+};
+/* ===== ระบบหลังบ้าน: ฐานข้อมูลส่วนตัวของผู้ใช้ (db) ===== */
+let SD=null,DB=null,PR=null,TC=null,lastT=null,seeded=false,sd=false,sdone=false,ROLE='-',pq=Promise.resolve();
+const cloudTxt=()=>DB&&S.sync?'🟢 เชื่อมต่อฐานข้อมูลแล้ว · ซิงก์อัตโนมัติ':'⚪ บันทึกในเครื่องนี้เท่านั้น';
+const wq=f=>{pq=pq.then(f).catch(()=>toast('ซิงก์ไม่สำเร็จ'))};
+const ch=()=>{if(!['form','courses'].includes(V.n))render()};
+function pp(){if(!DB)return;ps();wq(()=>PR.set({sel:S.sel,notify:S.notify,sync:S.sync,started:S.started,seeded:true,v:2,name:S.name||'',sid:S.sid||'',fac:S.fac||'',auth:S.auth||null}))}
+function pt(t){if(!DB||!S.sync)return;ps();const{id,...d}=t;wq(()=>TC.doc(String(id)).set(JSON.parse(JSON.stringify(d))))}
+function dt(id){ps();if(DB&&S.sync)wq(()=>TC.doc(String(id)).delete())}
+function seed(){if(sd)return;sd=true;const L=S.tasks.slice(),SL=S.sel.slice();wq(async()=>{await PR.set({sel:SL,notify:S.notify,sync:true,started:S.started,seeded:true,v:2,name:S.name||'',sid:S.sid||'',fac:S.fac||'',auth:S.auth||null});for(const t of L){const{id,...d}=t;await TC.doc(String(id)).set(JSON.parse(JSON.stringify(d)))}sdone=true;ap()})}
+const ap=()=>{if(seeded&&lastT&&(!sd||sdone)){S.tasks=lastT;ls();ch()}};
+async function initDB(){try{if(!window.claude)return;const[db,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!u)return;const id=await u.id();if(!id)return;
+ROLE=u.isOwner()?'เจ้าของ':u.canEdit()?'ผู้ดูแล (Editor)':u.can('data.write')===false?'ผู้ชม':'ผู้ร่วมใช้งาน';PR=db.doc('data/users/'+id+'/profile');TC=PR.collection('tasks');SD=db.doc('stats/'+id);dbok=true;
+PR.onSnapshot(s=>{DB=db;if(!rdy&&(s.exists||!s.metadata.fromCache)){rdy=true;ch()}if(!s.exists){seeded=false;if(!s.metadata.fromCache)seed();return}const d=s.data();S.sel=d.sel||[];S.notify=d.notify!==false;S.name=d.name||S.name;if(S.name)NAME=S.name;S.sid=d.sid||'';S.fac=d.fac||'';S.auth=d.auth||S.auth;S.sync=d.sync!==false;if(d.started)S.started=true;seeded=true;if(d.v!==2)heal();if(!window.s1){window.s1=1;ps()}ap();ls();ch()},()=>{});
+TC.onSnapshot(s=>{lastT=s.docs.map(d=>({...d.data(),id:d.id}));ap()},()=>{})}catch(e){}}
+P.admin=()=>{const T=S.tasks,dn=T.filter(t=>t.done).length,up=T.filter(t=>!t.done&&dd(t.date)>=0).length;
+return `${back('ระบบหลังบ้าน','me')}<div class="card row hero"><span style="font-size:26px">🗄️</span><div class="sp"><b>ฐานข้อมูล</b><div class="mu">${cloudTxt()}</div></div></div><div class="stat"><div class="card" style="cursor:pointer" onclick="tf='all';go('tasks')"><b>${T.length}</b><span class="mu">งานทั้งหมด</span></div><div class="card" style="cursor:pointer" onclick="tf='done';go('tasks')"><b>${dn}</b><span class="mu">เสร็จแล้ว</span></div><div class="card" style="cursor:pointer" onclick="tf='do';go('tasks')"><b>${up}</b><span class="mu">ยังไม่ถึงกำหนด</span></div><div class="card" style="cursor:pointer" onclick="go('courses')"><b>${S.sel.length}</b><span class="mu">รายวิชาที่เลือก</span></div></div><h2>งานแยกตามวิชา</h2>${S.sel.map(k=>`<div class="card row">${ic(k)}<span class="sp">${C[k].n}</span><b>${T.filter(t=>t.cs==k).length}</b></div>`).join('')||'<p class="mu">ยังไม่ได้เลือกรายวิชา</p>'}<div id="au"></div><h2>จัดการข้อมูล</h2><button class="btn l" style="margin-bottom:8px" onclick="exp()">⬇️ ส่งออกข้อมูล (JSON)</button><button class="btn d" onclick="rst()">รีเซ็ตข้อมูลทั้งหมด</button>`};
+async function exp(){try{const d=await claude.use('downloads');if(!d)return toast('ส่งออกไม่ได้ในมุมมองนี้');await d.save({filename:'course-schedule.json',data:JSON.stringify({user:NAME,courses:S.sel,tasks:S.tasks},null,2)});S.lb=Date.now();ls();if(V.n=='backup')render()}catch(e){}}
+function rst(){askc('ลบข้อมูลทั้งหมด?',()=>{const old=S.tasks;S.tasks=[];S.sel=[];save();for(const t of old)dt(t.id);toast('รีเซ็ตข้อมูลแล้ว');render()})}
+initDB().finally(()=>{if(!dbok){rdy=true;ch()}});
+function ps(){if(!SD)return;pq=pq.then(()=>SD.set({tasks:S.tasks.map(t=>({title:t.title,cs:t.cs,date:t.date,done:!!t.done})),courses:S.sel,at:Date.now()})).catch(()=>{})}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function lu(){const e=$('#au');if(!e||!DB)return;try{const u=await claude.use('user');if(!u)return;if(!u.canEdit()){e.innerHTML='<p class="mu" style="margin-top:12px">🔒 รายชื่อผู้ใช้ทั้งหมด ดูได้เฉพาะเจ้าของ/ผู้ดูแล</p>';return}
+const s=await DB.collection('stats').get(),pf=await u.profiles(s.docs.map(d=>d.id));
+e.innerHTML='<h2>ผู้ใช้ทั้งหมด ('+s.size+')</h2>'+(s.docs.map(d=>{const x=d.data(),T=x.tasks||[];return `<div class="card"><div class="row"><b class="sp">${esc((pf[d.id]||{}).name||'ผู้ใช้')}</b><span class="chip ok">${T.filter(t=>t.done).length}/${T.length} เสร็จ</span></div><div class="mu">${esc((x.courses||[]).join(', ')||'-')} · อัปเดต ${new Date(x.at||0).toLocaleDateString('th-TH')}</div>${T.slice(0,5).map(t=>`<div class="mu">• ${esc(t.title)} (${esc(t.cs)}) ${t.done?'✓':''}</div>`).join('')}</div>`}).join('')||'<p class="mu">ยังไม่มีข้อมูล</p>')}catch(x){}}
+async function dl(id){const t=S.tasks.find(x=>x.id==id);try{const d=await claude.use('downloads'),[h,b]=t.data.split(','),s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);await d.save({filename:t.file,data:new Blob([u],{type:h.match(/:(.*?);/)[1]})})}catch(e){toast('บันทึกไม่สำเร็จ')}}
+function rq(){try{window.Notification&&Notification.permission=='default'&&Notification.requestPermission()}catch(e){}}
+let fr=new Set;try{fr=new Set(JSON.parse(localStorage.getItem('cs26f')||'[]'))}catch(e){}
+function chk(){if(!S.notify)return;const n=Date.now();S.tasks.forEach(t=>{if(t.done||!t.rm)return;const at=new Date(t.date+'T'+t.time).getTime(),k=t.id+'@'+t.date+t.time;if(fr.has(k)||n<at-t.rm*6e4||n>at)return;fr.add(k);try{localStorage.setItem('cs26f',JSON.stringify([...fr]))}catch(e){}const m='⏰ '+t.title+' ('+t.cs+') ส่ง '+t.time;toast(m,6000);try{if(window.Notification&&Notification.permission=='granted')new Notification('แจ้งเตือนงาน',{body:m})}catch(e){}})}
+setInterval(chk,30000);
+const row2=(l,v)=>`<div class="row" style="padding:11px 0;border-bottom:1px solid var(--ln)"><span class="mu sp">${l}</span><b style="font-size:13px;text-align:right">${esc(v)}</b></div>`;
+P.profile=()=>`${back('ข้อมูลส่วนตัว','me')}<div class="card" style="text-align:center"><div class="ic av" style="width:72px;height:72px;border-radius:50%;font-size:32px;margin:0 auto 8px">👤</div><b>${esc(NAME)}</b><div class="mu">${esc(ROLE)}</div></div><label>ชื่อที่แสดง</label><input id="pn" value="${esc(NAME)}"><label>รหัสนักศึกษา</label><input id="pi" ${S.auth?'readonly':''} value="${esc(S.sid||'')}" placeholder="เช่น 66xxxxxxx"><label>คณะ / สาขา</label><input id="pc" value="${esc(S.fac||'')}" placeholder="เช่น วิศวกรรมศาสตร์ / คอมพิวเตอร์"><button class="btn" onclick="sp()">บันทึกข้อมูลส่วนตัว</button><h2>🔒 เปลี่ยนรหัสผ่าน</h2><label>รหัสผ่านเดิม</label><input id="po" type="password" autocomplete="current-password"><label>รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)</label><input id="pw1" type="password" autocomplete="new-password"><label>ยืนยันรหัสผ่านใหม่</label><input id="pw2" type="password" autocomplete="new-password"><button class="btn l" onclick="cp()">เปลี่ยนรหัสผ่าน</button><h2>สรุปการใช้งาน</h2><div class="card" style="padding:0 12px">${row2('งานทั้งหมด',S.tasks.length)}${row2('เสร็จแล้ว',S.tasks.filter(t=>t.done).length)}${row2('รายวิชาที่เลือก',S.sel.length)}${row2('สถานะข้อมูล',cloudTxt().slice(2))}</div>`;
+P.backup=()=>`${back('สำรองข้อมูล','me')}<div class="card row hero"><span style="font-size:26px">📦</span><div class="sp"><b>สำรองและกู้คืนข้อมูล</b><div class="mu">${cloudTxt()}</div></div></div><div class="card" style="padding:0 12px">${row2('งานที่จะสำรอง',S.tasks.length+' รายการ')}${row2('รายวิชา',S.sel.length+' วิชา')}${row2('ไฟล์แนบ',S.tasks.filter(t=>t.data).length+' ไฟล์')}${row2('สำรองล่าสุด',S.lb?new Date(S.lb).toLocaleString('th-TH'):'ยังไม่เคย')}</div><button class="btn" style="margin-bottom:8px" onclick="exp()">⬇️ สำรองข้อมูล (JSON)</button><label class="btn l" style="display:block;text-align:center;margin-bottom:8px">⬆️ กู้คืนจากไฟล์ JSON<input hidden type="file" accept="application/json,.json" onchange="imp(this)"></label><button class="btn l" onclick="askc('เพิ่มงานตัวอย่างกลับเข้ามา?',()=>restore(true))">🔄 คืนค่าข้อมูลตัวอย่าง</button><p class="mu" style="margin-top:12px">การกู้คืนจะเพิ่มงานจากไฟล์เข้ามา ไม่ลบงานที่มีอยู่</p>`;
+P.about=()=>`${back('เกี่ยวกับแอป','me')}<div class="card" style="text-align:center"><div class="logo" style="width:90px;height:90px;font-size:44px;border-radius:26px">🗓️</div><b style="display:block;margin-top:10px">ระบบบริหารจัดการรายวิชาและตารางงาน</b><span class="mu">เวอร์ชัน 1.2.0</span></div><h2>สถานะระบบ</h2><div class="card" style="padding:0 12px">${row2('ฐานข้อมูล',cloudTxt().slice(2))}${row2('สิทธิ์การใช้งาน',ROLE)}${row2('การแจ้งเตือน',!S.notify?'ปิด':window.Notification?{granted:'อนุญาตแล้ว',denied:'ถูกบล็อก',default:'ยังไม่ได้อนุญาต'}[Notification.permission]:'ในแอปเท่านั้น')}${row2('วันที่อ้างอิงในระบบ',fd(TODAY))}</div><h2>ฟีเจอร์</h2><div class="card mu" style="line-height:1.9">✓ เลือกตารางเรียนจากรายวิชา<br>✓ เพิ่ม/แก้ไข/ลบงาน แนบรูปและไฟล์<br>✓ ปฏิทินดูงานรายวัน<br>✓ แจ้งเตือนก่อนส่งงาน<br>✓ ซิงก์ข้ามอุปกรณ์ สำรอง/กู้คืนข้อมูล<br>✓ หน้าแอดมินดูภาพรวมผู้ใช้</div><button class="btn l" onclick="go('admin')">🛠️ เปิดระบบหลังบ้าน</button>`;
+function sp(){S.name=$('#pn').value.trim()||NAME;NAME=S.name;S.sid=$('#pi').value.trim();S.fac=$('#pc').value.trim();save();toast('บันทึกข้อมูลส่วนตัวแล้ว');render()}
+function imp(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!Array.isArray(j.tasks))throw 0;let n=0;j.tasks.forEach((t,k)=>{if(!t||!t.title||!C[t.cs])return;const x={id:String(Date.now()+k),title:String(t.title),cs:t.cs,desc:String(t.desc||''),date:/^\d{4}-\d\d-\d\d$/.test(t.date)?t.date:TODAY,time:/^\d\d:\d\d$/.test(t.time)?t.time:'10:00',rm:+t.rm||0,done:!!t.done,file:String(t.file||''),data:/^data:/.test(t.data)?t.data:''};S.tasks.push(x);pt(x);n++});(j.courses||[]).forEach(k=>{if(C[k]&&!S.sel.includes(k))S.sel.push(k)});save();toast('กู้คืน '+n+' งานแล้ว');render()}catch(e){toast('ไฟล์ไม่ถูกต้อง')}};r.readAsText(f)}
+function restore(m){const have=S.tasks.map(t=>t.title);def.tasks.forEach(t=>{if(m&&have.includes(t.title))return;const x={...t,id:String(Date.now()+t.id),rm:0};S.tasks.push(x);pt(x)});Object.keys(C).forEach(k=>{if(!S.sel.includes(k))S.sel.push(k)});save();if(m){toast('คืนค่าข้อมูลตัวอย่างแล้ว');render()}}
+let hl=0;function heal(){if(hl)return;hl=1;const run=()=>{if(lastT===null)return setTimeout(run,600);if(!lastT.length)restore();wq(()=>PR.update({v:2}))};run()}
+let lm=null,fl=0,lk=0,rdy=false,dbok=false;setTimeout(()=>{if(!rdy){rdy=true;ch()}},4000);
+const hex=b=>[...b].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function hp(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);const s=new Uint8Array(salt.match(/../g).map(h=>parseInt(h,16)));return hex(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:s,iterations:150000,hash:'SHA-256'},k,256)))}
+function lform(){if(!rdy)return '<p class="mu">⏳ กำลังเชื่อมต่อฐานข้อมูล...</p>';if(lm=='chg')return chgForm();if(lm=='fgt')return fgtForm();const reg=lm?lm=='reg':!S.auth;
+return `<div style="text-align:left">${tabs3(reg?'reg':'login')}<p class="mu" style="text-align:center;margin-bottom:10px">${reg?'✨ ครั้งแรก: สร้างบัญชีด้วยรหัสนักศึกษาและรหัสผ่าน':'เข้าสู่ระบบด้วยรหัสนักศึกษาของคุณ'}</p>${reg?`<label>ชื่อ-นามสกุล</label><input id="lnm" value="${esc(S.name||'')}" placeholder="เช่น นางสาวบี เบิร์ดนก"><label>คณะ / สาขา</label><input id="lfc" value="${esc(S.fac||'')}" placeholder="เช่น วิศวกรรมศาสตร์">`:''}<label>รหัสนักศึกษา</label><input id="lsid" autocomplete="username" maxlength="15" placeholder="เช่น 66010001" value="${reg||!S.auth?'':esc(S.auth.sid)}"><label>รหัสผ่าน</label><div class="row" style="gap:6px"><input id="lpw" type="password" autocomplete="${reg?'new-password':'current-password'}" placeholder="อย่างน้อย 6 ตัวอักษร" onkeydown="if(event.key=='Enter')lg()"><button class="ib" style="margin-bottom:12px" onclick="const p=$('#lpw');p.type=p.type=='password'?'text':'password'">👁️</button></div>${reg?`<label>ยืนยันรหัสผ่าน</label><input id="lpw2" type="password" autocomplete="new-password" onkeydown="if(event.key=='Enter')lg()">`:''}<div id="lerr" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:6px"></div><button class="btn" onclick="lg()">${reg?'ลงทะเบียนและเริ่มใช้งาน':'เข้าสู่ระบบ'}</button>${reg?'':'<button class="btn g" onclick="fgp()">ลืมรหัสผ่าน?</button>'}</div>`}
+function enter(){setS(1);S.started=true;ls();go('home')}
+async function lg(){const e=$('#lerr'),sid=$('#lsid').value.trim(),pw=$('#lpw').value,msg=m=>{e.textContent=m};
+if(!/^[0-9A-Za-z]{6,15}$/.test(sid))return msg('รหัสนักศึกษาต้องเป็นตัวอักษร/ตัวเลข 6-15 ตัว');
+if(pw.length<6)return msg('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+if(!(window.crypto&&crypto.subtle))return msg('เบราว์เซอร์นี้ไม่รองรับการเข้ารหัส');
+if($('#lpw2')){if(pw!=$('#lpw2').value)return msg('รหัสผ่านไม่ตรงกัน');const nm=$('#lnm').value.trim();if(!nm)return msg('กรุณากรอกชื่อ-นามสกุล');if(S.auth&&!window.rg2){askc('มีบัญชีอยู่แล้ว ต้องการลงทะเบียนใหม่แทนบัญชีเดิมหรือไม่?',()=>{window.rg2=1;lg()});return}const salt=hex(crypto.getRandomValues(new Uint8Array(16)));S.auth={sid,salt,hash:await hp(pw,salt)};S.sid=sid;S.name=nm;NAME=nm;S.fac=$('#lfc').value.trim();save();lm=null;window.rg2=0;return enter()}
+if(!S.auth)return msg('ยังไม่มีบัญชี กรุณาลงทะเบียนก่อน');
+if(Date.now()<lk)return msg('ลองผิดหลายครั้ง กรุณารอ '+Math.ceil((lk-Date.now())/1000)+' วินาที');
+if(sid.toLowerCase()==S.auth.sid.toLowerCase()&&await hp(pw,S.auth.salt)==S.auth.hash){fl=0;return enter()}
+if(++fl>=5){fl=0;lk=Date.now()+30000}msg('รหัสนักศึกษาหรือรหัสผ่านไม่ถูกต้อง')}
+function fgp(){lm='fgt';render()}
+function askc(m,f){const o=document.createElement('div');o.style.cssText='position:absolute;inset:0;background:#0008;display:grid;place-items:center;z-index:20;padding:24px';o.innerHTML='<div class="card" style="max-width:300px;text-align:center;margin:0"><p style="margin-bottom:14px;font-size:14px"></p><div class="row"><button class="btn l" id="cn">ยกเลิก</button><button class="btn" id="cy">ตกลง</button></div></div>';o.querySelector('p').textContent=m;o.querySelector('#cn').onclick=()=>o.remove();o.querySelector('#cy').onclick=()=>{o.remove();f()};$('.phone').append(o)}
+function fgtForm(){return `<div style="text-align:left">${tabs3('')}<p class="mu" style="text-align:center;margin-bottom:10px">ลืมรหัสผ่าน: ยืนยันรหัสนักศึกษา แล้วตั้งรหัสผ่านใหม่</p><label>รหัสนักศึกษา</label><input id="fsid" autocomplete="username" maxlength="15"><label>รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)</label><input id="fnw" type="password" autocomplete="new-password"><label>ยืนยันรหัสผ่านใหม่</label><input id="fnw2" type="password" autocomplete="new-password" onkeydown="if(event.key=='Enter')fgs()"><div id="lerr" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:6px"></div><button class="btn" onclick="fgs()">ตั้งรหัสผ่านใหม่</button><button class="btn g" onclick="lm='login';render()">กลับไปเข้าสู่ระบบ</button></div>`}
+async function fgs(){const e=$('#lerr'),msg=m=>{e.textContent=m};try{if(!S.auth)return msg('ยังไม่มีบัญชี กรุณาลงทะเบียนก่อน');if(Date.now()<lk)return msg('ลองผิดหลายครั้ง กรุณารอ '+Math.ceil((lk-Date.now())/1000)+' วินาที');const sid=$('#fsid').value.trim(),n=$('#fnw').value;if(sid.toLowerCase()!=S.auth.sid.toLowerCase()){if(++fl>=5){fl=0;lk=Date.now()+30000}return msg('รหัสนักศึกษาไม่ตรงกับที่ลงทะเบียนไว้')}if(n.length<6)return msg('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร');if(n!=$('#fnw2').value)return msg('รหัสผ่านใหม่ไม่ตรงกัน');const salt=hex(crypto.getRandomValues(new Uint8Array(16)));S.auth={...S.auth,salt,hash:await hp(n,salt)};save();fl=0;lm='login';render();toast('ตั้งรหัสผ่านใหม่แล้ว เข้าสู่ระบบได้เลย',3000)}catch(x){msg('ไม่สำเร็จ ลองใหม่อีกครั้ง')}}
+async function cp(){try{const o=$('#po').value,n=$('#pw1').value;if(!S.auth)return toast('ยังไม่ได้ตั้งรหัสผ่าน');if(!o)return toast('กรุณากรอกรหัสผ่านเดิม');if(n.length<6)return toast('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัว');if(n!=$('#pw2').value)return toast('รหัสผ่านใหม่ไม่ตรงกัน');if(await hp(o,S.auth.salt)!=S.auth.hash)return toast('รหัสผ่านเดิมไม่ถูกต้อง');if(n==o)return toast('รหัสผ่านใหม่ต้องไม่ซ้ำกับเดิม');const salt=hex(crypto.getRandomValues(new Uint8Array(16)));S.auth={...S.auth,salt,hash:await hp(n,salt)};save();render();toast('เปลี่ยนรหัสผ่านแล้ว')}catch(x){toast('เปลี่ยนรหัสผ่านไม่สำเร็จ ลองใหม่อีกครั้ง')}}
+function tabs3(a){return `<div class="tabs" style="justify-content:center">${[['login','เข้าสู่ระบบ'],['reg','ลงทะเบียน'],['chg','เปลี่ยนรหัสผ่าน']].map(x=>`<button class="tab ${a==x[0]?'on':''}" onclick="lm='${x[0]}';render()">${x[1]}</button>`).join('')}</div>`}
+function chgForm(){return `<div style="text-align:left">${tabs3('chg')}<p class="mu" style="text-align:center;margin-bottom:10px">${S.auth?'ยืนยันรหัสผ่านเดิม แล้วตั้งรหัสผ่านใหม่':'ยังไม่มีบัญชี กรุณาลงทะเบียนก่อน'}</p><label>รหัสนักศึกษา</label><input id="csid" autocomplete="username" maxlength="15"><label>รหัสผ่านเดิม</label><input id="cold" type="password" autocomplete="current-password"><label>รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)</label><input id="cnew" type="password" autocomplete="new-password"><label>ยืนยันรหัสผ่านใหม่</label><input id="cnew2" type="password" autocomplete="new-password" onkeydown="if(event.key=='Enter')cpw()"><div id="lerr" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:6px"></div><button class="btn" onclick="cpw()">เปลี่ยนรหัสผ่าน</button></div>`}
+async function cpw(){const e=$('#lerr'),msg=m=>{e.textContent=m};try{const sid=$('#csid').value.trim(),o=$('#cold').value,n=$('#cnew').value;
+if(!S.auth)return msg('ยังไม่มีบัญชี กรุณาลงทะเบียนก่อน');
+if(Date.now()<lk)return msg('ลองผิดหลายครั้ง กรุณารอ '+Math.ceil((lk-Date.now())/1000)+' วินาที');
+if(!sid||!o)return msg('กรุณากรอกรหัสนักศึกษาและรหัสผ่านเดิม');
+if(sid.toLowerCase()!=S.auth.sid.toLowerCase()||await hp(o,S.auth.salt)!=S.auth.hash){if(++fl>=5){fl=0;lk=Date.now()+30000}return msg('รหัสนักศึกษาหรือรหัสผ่านเดิมไม่ถูกต้อง')}
+if(n.length<6)return msg('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร');
+if(n!=$('#cnew2').value)return msg('รหัสผ่านใหม่ไม่ตรงกัน');
+if(n==o)return msg('รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม');
+const salt=hex(crypto.getRandomValues(new Uint8Array(16)));S.auth={...S.auth,salt,hash:await hp(n,salt)};save();fl=0;lm='login';render();toast('เปลี่ยนรหัสผ่านแล้ว เข้าสู่ระบบด้วยรหัสใหม่',3000)}catch(x){msg('เปลี่ยนรหัสผ่านไม่สำเร็จ ลองใหม่อีกครั้ง')}}
+function cl(){const q=($('#q')||{value:''}).value.toLowerCase();$('#cl').innerHTML=Object.keys(C).filter(k=>(cf=='all'||S.sel.includes(k))&&(C[k].n+k).toLowerCase().includes(q)).map(k=>`<div class="card row" style="cursor:pointer" onclick="tc('${k}')">${ic(k)}<div class="sp"><b style="font-size:14px">${C[k].n}</b><div class="mu">${C[k].s} · ${C[k].t}</div></div>${S.sel.includes(k)?'<span style="color:var(--pr);font-size:20px">✔</span>':'<span class="mu">○</span>'}</div>`).join('')}
+function tc(k){S.sel=S.sel.includes(k)?S.sel.filter(x=>x!=k):[...S.sel,k];cl()}
+function tg(id){const t=S.tasks.find(x=>x.id==id);t.done=!t.done;ls();pt(t);render()}
+function del(id){askc('ต้องการลบงานนี้หรือไม่?',()=>{S.tasks=S.tasks.filter(x=>x.id!=id);ls();dt(id);toast('ลบงานแล้ว');go('tasks')})}
+function cm(d){cal.m+=d;if(cal.m<0){cal.m=11;cal.y--}if(cal.m>11){cal.m=0;cal.y++}render()}
+function fn(i){const f=i.files[0];if(!f)return;window.fname=f.name;window.fdata='';$('#fnm').textContent='📄 '+f.name;const rd=new FileReader(),ok=()=>{if(window.fdata.length>230000){window.fdata='';toast('ไฟล์ใหญ่เกินไป เก็บเฉพาะชื่อ')}else $('#fnm').textContent='📎 '+f.name+' (พร้อมบันทึก)'};
+if(f.type.startsWith('image/')){const im=new Image();rd.onload=()=>{im.onload=()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);window.fdata=c.toDataURL('image/jpeg',.7);ok()};im.src=rd.result};rd.readAsDataURL(f)}
+else if(f.size<=140000){rd.onload=()=>{window.fdata=rd.result;ok()};rd.readAsDataURL(f)}
+else $('#fnm').textContent='📄 '+f.name+' (เกิน 140KB เก็บเฉพาะชื่อ)'}
+function sv(id){const o={title:$('#ft').value.trim(),cs:$('#fc').value,desc:$('#fd').value,date:$('#fa').value,time:$('#fi').value,rm:+$('#fr').value};if(!o.title||!o.cs||!o.date)return toast('กรุณากรอกข้อมูลที่จำเป็น *');
+if(id){const t=S.tasks.find(x=>x.id==id);Object.assign(t,o);if(window.fname){t.file=window.fname;t.data=window.fdata||''}window.nt=t}else{window.nt={id:String(Date.now()),...o,file:window.fname||'',data:window.fdata||''};S.tasks.push(window.nt)}
+window.fname=window.fdata='';ls();pt(window.nt);rq();toast('บันทึกข้อมูลเรียบร้อย');go(id?'detail':'tasks',id||undefined)}
+function render(){$('#app').innerHTML=P[V.n]();if(V.n=='courses')cl();if(V.n=='admin')lu();$('#app').scrollTop=0;
+const tabs=[['home','🏠','หน้าหลัก'],['cal','📅','ปฏิทิน'],['tasks','📋','งานของฉัน'],['me','👤','โปรไฟล์']],on={home:'home',courses:'home',notif:'home',cal:'cal',tasks:'tasks',detail:'tasks',form:'tasks',me:'me',admin:'me',profile:'me',backup:'me',about:'me'}[V.n];
+$('#nv').innerHTML=V.n=='splash'?'':`<div class="nav">${tabs.map(t=>`<button class="${t[0]==on?'on':''}" onclick="go('${t[0]}')"><span>${t[1]}</span>${t[2]}</button>`).join('')}</div>`}
+render();
+</script>
+</body>
+</html>
